@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KING STAR CHECKER</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; padding: 28px 16px;
+      display: grid; place-items: center;
+      background: radial-gradient(ellipse at top, #401010, #09090d 65%);
+      color: white; font-family: Arial, sans-serif;
+    }
+    main {
+      width: 100%; max-width: 440px; padding: 26px;
+      border: 1px solid #743333; border-radius: 24px;
+      background: #100d13eF; box-shadow: 0 0 35px #8b101033;
+    }
+    h1 { text-align: center; letter-spacing: 3px; }
+    h1 span { color: #ff4141; }
+    p { color: #bcb4c1; text-align: center; }
+    label { display: block; margin: 24px 0 8px; }
+    input, button {
+      width: 100%; padding: 15px; border-radius: 12px;
+      font-size: 16px;
+    }
+    input {
+      background: #09070d; border: 1px solid #624078;
+      color: white; outline: none;
+    }
+    button {
+      margin-top: 16px; border: 0; color: white;
+      background: linear-gradient(90deg, #a20e21, #ed303b);
+      font-weight: bold;
+    }
+    #result {
+      display: none; margin-top: 20px; padding: 16px;
+      border-radius: 12px; background: #21171d;
+      overflow-wrap: anywhere;
+    }
+    small { color: #bcb4c1; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>👑 KING <span>STAR</span></h1>
+    <p>NUMBER CHECKER</p>
+    <label for="phone">Phone number with country code</label>
+    <input id="phone" type="tel" placeholder="+2547XXXXXXXX">
+    <button id="check">CHECK</button>
+    <div id="result" role="status"></div>
+    <p><small>Demo checker — no real WhatsApp ban data is accessed.</small></p>
+  </main>
+  <script>
+    const input = document.getElementById('phone');
+    const result = document.getElementById('result');
+
+    document.getElementById('check').onclick = () => {
+      const phone = input.value.trim();
+      result.style.display = 'block';
+
+      if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
+        result.textContent =
+          'Enter a valid international number, e.g. +2547XXXXXXXX.';
+        return;
+      }
+
+      result.textContent =
+        'Format looks valid. This demo cannot check WhatsApp ban status.';
+    };
+  </script>
+</body>
+</html>
