@@ -70,5 +70,46 @@
       'Format looks valid. This demo cannot check WhatsApp ban status.';
   };
   </script>
+
+  <section id="king-chat" style="max-width:500px;margin:28px auto;padding:18px;background:#151515;color:white;border:1px solid #b22222;border-radius:14px;font-family:Arial,sans-serif;">
+    <h2 style="color:#ff3333;margin-top:0;">KING STAR BOT</h2>
+    <div id="chat-messages" style="height:180px;overflow-y:auto;background:#080808;padding:12px;border-radius:8px;margin-bottom:12px;">Bot: Karibu KING STAR! Nikusaidie nini?</div>
+    <form id="chat-form" style="display:flex;gap:8px;">
+      <input id="chat-input" placeholder="Andika ujumbe..." autocomplete="off" style="min-width:0;flex:1;padding:11px;border-radius:7px;border:1px solid #555;">
+      <button type="submit" style="background:#c00000;color:white;border:0;border-radius:7px;padding:10px;">TUMA</button>
+    </form>
+  </section>
+  <script>
+    document.getElementById('chat-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = document.getElementById('chat-input');
+      const messages = document.getElementById('chat-messages');
+      const message = input.value.trim();
+      if (!message) return;
+
+      const userLine = document.createElement('p');
+      userLine.textContent = 'Wewe: ' + message;
+      messages.appendChild(userLine);
+      input.value = '';
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+        const botLine = document.createElement('p');
+        botLine.textContent = 'KING STAR BOT: ' + (data.reply || 'Samahani, jaribu tena.');
+        messages.appendChild(botLine);
+      } catch (error) {
+        const botLine = document.createElement('p');
+        botLine.textContent = 'Bot haipatikani kwa sasa. Jaribu tena.';
+        messages.appendChild(botLine);
+      }
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
+
 </body>
 </html>
