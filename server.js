@@ -39,3 +39,4 @@ app.post('/api/chat', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`KING STAR website: http://localhost:${PORT}`);
 });
+require('./telegram');
