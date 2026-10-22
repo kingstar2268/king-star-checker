@@ -57,18 +57,18 @@
     const result = document.getElementById('result');
 
     document.getElementById('check').onclick = () => {
-      const phone = input.value.trim();
-      result.style.display = 'block';
+    const phone = input.value.trim().replace(/[\s()-]/g, '');
+    result.style.display = 'block';
 
-      if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
-        result.textContent =
-          'Enter a valid international number, e.g. +2547XXXXXXXX.';
-        return;
-      }
-
+    if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
       result.textContent =
-        'Format looks valid. This demo cannot check WhatsApp ban status.';
-    };
+        'Enter a valid international number, e.g. +2547XXXXXXXX.';
+      return;
+    }
+
+    result.textContent =
+      'Format looks valid. This demo cannot check WhatsApp ban status.';
+  };
   </script>
 </body>
 </html>
