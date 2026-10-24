@@ -1,2 +1,22 @@
 node_modules/
 .env
+
+# Private sessions and secrets
+kingstar-session/
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Android local files and build output
+android/local.properties
+android/.gradle/
+android/**/build/
+android/captures/
+
+# Local backups - keep on phone, not in GitHub
+backups/
+*-backup*
+*-before-*
+*-broken*
+*-error*
