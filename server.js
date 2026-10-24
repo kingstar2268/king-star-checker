@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 
@@ -14,29 +16,52 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+app.post('/api/chat', async (req, res) => {
+  const message = String(req.body?.message || '').trim();
 
-app.post('/api/chat', (req, res) => {
-  const message = String(req.body.message || '').trim().toLowerCase();
-
-  let reply;
   if (!message) {
-    reply = 'Andika ujumbe kwanza.';
-  } else if (message.includes('hello') || message.includes('hi') || message.includes('habari')) {
-    reply = 'Habari! Mimi ni KING STAR BOT. Nikusaidie nini?';
-  } else if (message.includes('king star')) {
-    reply = 'Karibu KING STAR CHECKER! Naweza kueleza jinsi ya kutumia website yetu.';
-  } else if (message.includes('whatsapp') || message.includes('ban')) {
-    reply = 'Kwa sasa checker hii inathibitisha format ya namba tu; haiwezi kuthibitisha WhatsApp ban.';
-  } else if (message.includes('telegram')) {
-    reply = 'Telegram itaunganishwa katika hatua inayofuata.';
-  } else {
-    reply = 'Asante kwa ujumbe wako! Mimi ni KING STAR BOT ya majaribio. Jaribu kuuliza kuhusu KING STAR, WhatsApp au Telegram.';
+    return res.json({ reply: 'Andika ujumbe kwanza.' });
   }
 
-  res.json({ reply });
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(503).json({
+      reply: 'AI haijawekwa. Kagua GROQ_API_KEY kwenye .env.'
+    });
+  }
+
+  try {
+    const Groq = require('groq-sdk');
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY
+    });
+
+    const completion = await groq.chat.completions.create({
+      model: 'openai/gpt-oss-20b',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are KING STAR BOT. Reply helpfully in the language the user uses. Help with number format validation, WhatsApp official support and appeals. Never claim you can ban numbers or access private WhatsApp ban records.'
+        },
+        { role: 'user', content: message }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    });
+
+    const reply = completion.choices?.[0]?.message?.content?.trim();
+    return res.json({
+      reply: reply || 'Samahani, jaribu tena.'
+    });
+  } catch (error) {
+    console.error('Groq AI error:', error.message);
+    return res.status(502).json({
+      reply: 'AI haijajibu. Kagua internet, API key au model.'
+    });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`KING STAR website: http://localhost:${PORT}`);
 });
+
 require('./telegram');

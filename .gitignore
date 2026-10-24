@@ -20,3 +20,8 @@ backups/
 *-before-*
 *-broken*
 *-error*
+
+# Local bot scripts - do not publish
+add-tools.js
+whatsapp-pre-command-fix.js
+whatsapp.js
