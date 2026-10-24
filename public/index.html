@@ -56,10 +56,22 @@
     <h2 style="color:#ff4141;margin-top:0;">🚀 DEPLOY KING STAR BOT</h2>
     <p style="color:#ddd;">Bei ya huduma: <strong>KSh 20</strong></p>
     <p style="color:#bbb;">Malipo ya M-Pesa bado yanaandaliwa. Usitume pesa kupitia ukurasa huu mpaka mfumo rasmi wa malipo uthibitishwe.</p>
-    <button type="button" disabled style="width:100%;padding:13px;background:#555;color:white;border:0;border-radius:10px;">M-PESA — INAKUJA HIVI KARIBUNI</button>
+    <button id="bot-status-btn" type="button" style="width:100%;padding:13px;background:#b00020;color:white;border:0;border-radius:10px;">ANGALIA HALI YA BOT</button><p id="bot-status-result" role="status"></p>
   </section>
 
   <script>
+    document.getElementById('bot-status-btn').addEventListener('click', async () => {
+    const out = document.getElementById('bot-status-result');
+    out.textContent = 'Inaangalia...';
+    try {
+      const r = await fetch('/api/status');
+      const d = await r.json();
+      out.textContent = r.ok ? 'Seva: ' + (d.status || 'inapatikana') : 'Seva haijajibu vizuri.';
+    } catch (e) {
+      out.textContent = 'Seva haipatikani kwa sasa. Jaribu tena.';
+    }
+  });
+
     const input = document.getElementById('phone');
     const result = document.getElementById('result');
 
