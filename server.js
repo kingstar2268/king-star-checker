@@ -2,6 +2,11 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const { startWhatsApp } = require('./whatsapp-session');
+const fs = require('fs');
+const crypto = require('crypto');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -59,6 +64,50 @@ app.post('/api/chat', async (req, res) => {
     });
   }
 });
+
+
+const pairingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 3,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Umejaribu mara nyingi. Subiri dakika 15.' }
+});
+
+app.post('/api/pairing', pairingLimiter, async (req, res) => {
+  const phone = String(req.body?.phone || '').replace(/[ +()-]/g, '');
+
+  if (!/^\d{8,15}$/.test(phone)) {
+    return res.status(400).json({
+      error: 'Weka namba ya kimataifa bila +, mfano 2547XXXXXXXX.'
+    });
+  }
+
+  const sessionsRoot = path.join(__dirname, 'user-sessions');
+  const sessionDir = path.join(sessionsRoot, crypto.randomUUID());
+
+  try {
+    fs.mkdirSync(sessionsRoot, { recursive: true, mode: 0o700 });
+    fs.mkdirSync(sessionDir, { mode: 0o700 });
+
+    const result = await startWhatsApp(sessionDir, phone);
+
+    if (!result.pairingCode) {
+      return res.status(409).json({
+        error: 'Pairing code haikupatikana. Jaribu tena baadaye.'
+      });
+    }
+
+    return res.json({ pairingCode: result.pairingCode });
+  } catch (error) {
+    console.error('Pairing error details:', error);
+    return res.status(502).json({
+      error: 'Pairing imeshindikana. Hakikisha namba ni sahihi na ujaribu tena.'
+    });
+  }
+});
+
+
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`KING STAR website: http://localhost:${PORT}`);

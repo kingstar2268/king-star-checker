@@ -25,3 +25,16 @@ backups/
 add-tools.js
 whatsapp-pre-command-fix.js
 whatsapp.js
+# Private WhatsApp user sessions
+user-sessions/
+
+# Private WhatsApp sessions
+user-sessions/
+kingstar-session/
+
+# Local backups
+*.backup
+*.backup-*
+*.bak
+*.before-*
+*.before_*

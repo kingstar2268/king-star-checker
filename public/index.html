@@ -136,5 +136,83 @@
     });
   </script>
 
+
+<section style="margin:24px 0;padding:18px;border:1px solid #444;border-radius:14px;">
+  <h2>📱 KING STAR — PAIR DEVICE</h2>
+  <p>Chagua nchi yako na uweke namba ya WhatsApp.</p>
+  <form id="pairing-form">
+    <label for="pairing-country">COUNTRY</label>
+    <select id="pairing-country" style="box-sizing:border-box;width:100%;padding:12px;margin-bottom:10px;border-radius:8px;">
+      <option value="254" selected>🇰🇪 Kenya (+254)</option>
+      <option value="255">🇹🇿 Tanzania (+255)</option>
+      <option value="256">🇺🇬 Uganda (+256)</option>
+      <option value="250">🇷🇼 Rwanda (+250)</option>
+      <option value="257">🇧🇮 Burundi (+257)</option>
+      <option value="1">🇺🇸 United States (+1)</option>
+      <option value="44">🇬🇧 United Kingdom (+44)</option>
+    </select>
+    <label for="pairing-phone">WHATSAPP NUMBER</label>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span id="pairing-prefix" style="padding:12px;border:1px solid #624078;border-radius:8px;white-space:nowrap;">+254</span>
+      <input id="pairing-phone" type="tel" inputmode="numeric"
+        placeholder="712345678" required maxlength="15"
+        style="box-sizing:border-box;min-width:0;width:100%;padding:12px;margin-bottom:10px;border-radius:8px;">
+    </div>
+    <button id="pairing-submit" type="submit"
+      style="padding:12px 16px;border-radius:8px;cursor:pointer;">
+      GENERATE PAIRING CODE
+    </button>
+  </form>
+  <p id="pairing-status" role="status"></p>
+  <p id="pairing-code" style="font-size:24px;font-weight:bold;letter-spacing:3px;overflow-wrap:anywhere;"></p>
+  <p>Usimpe mtu mwingine pairing code yako. Ingiza code kwenye WhatsApp yako tu.</p>
+</section>
+
+<script>
+document.getElementById('pairing-country').addEventListener('change', (event) => {
+  document.getElementById('pairing-prefix').textContent = '+' + event.target.value;
+});
+
+document.getElementById('pairing-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const country = document.getElementById('pairing-country').value;
+  let localNumber = document.getElementById('pairing-phone').value.replace(/\D/g, '');
+  if (localNumber.startsWith('0')) localNumber = localNumber.slice(1);
+  const phone = country + localNumber;
+  const status = document.getElementById('pairing-status');
+  const code = document.getElementById('pairing-code');
+  const button = document.getElementById('pairing-submit');
+
+  status.textContent = 'Inaomba pairing code...';
+  code.textContent = '';
+  button.disabled = true;
+
+  try {
+    const response = await fetch('/api/pairing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data.pairingCode) {
+      throw new Error(data.error || 'Pairing code haikupatikana.');
+    }
+
+    code.textContent = data.pairingCode;
+status.textContent = 'Ingiza code ndani ya dakika 10.';
+if (window.pairingTimer) clearTimeout(window.pairingTimer);
+window.pairingTimer = setTimeout(() => {
+  code.textContent = '';
+  status.textContent = 'Muda wa code umeisha. Pata code mpya.';
+}, 10 * 60 * 1000);
+  } catch (error) {
+    status.textContent = error.message || 'Hitilafu imetokea. Jaribu tena.';
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
+
 </body>
 </html>
